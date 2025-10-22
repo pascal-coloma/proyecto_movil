@@ -4,43 +4,51 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.medbusq.medbusq.ui.theme.MedbusqTheme
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.medbusq.medbusq.view.Busqueda
+import com.medbusq.medbusq.view.RegistroScreen
+import com.medbusq.medbusq.view.ResumenScreen
+import com.medbusq.medbusq.view.InicioScreen
+import com.medbusq.medbusq.viewmodel.MedicamentoViewModel
+import com.medbusq.medbusq.viewmodel.UsuarioViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MedbusqTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
+            val navController = rememberNavController()
+
+            val usuarioViewModel : UsuarioViewModel = viewModel()
+            val medicamentoViewModel : MedicamentoViewModel = viewModel()
+
+            NavHost(navController = navController, startDestination = "Inicio"){
+                composable ("Inicio") {
+                    InicioScreen(
+                        navController
+                    )
+                }
+                composable ("Busqueda"){
+                    Busqueda(
+                        navController,
+                        medicamentoViewModel
+                    )
+                }
+                composable("RegistroScreen") {
+                    RegistroScreen(
+                        navController, usuarioViewModel
+                    )
+                }
+                composable ("resumen") {
+                    ResumenScreen(
+                        usuarioViewModel
                     )
                 }
             }
         }
     }
 }
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    MedbusqTheme {
-        Greeting("Android")
-    }
-}
