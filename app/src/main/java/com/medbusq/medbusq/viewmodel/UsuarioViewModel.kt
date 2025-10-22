@@ -33,20 +33,26 @@ class UsuarioViewModel : ViewModel() {
         _estado.update { it.copy(terminos = valor) }
     }
 
+    fun onRutChange(valor: String){
+        _estado.update { it.copy(rut = valor) }
+    }
+
     fun validarFormulario():Boolean{
         val estadoActual = _estado.value
         val errores = UsuarioErrores(
             nombre = if (estadoActual.nombre.isBlank()) "Debe ingresar el Nombre" else null,
             correo = if (!estadoActual.correo.contains(("@"))) "Correo no valido" else null,
             clave = if  (estadoActual.clave.length < 8) "Contrasenna debe tener al menos 8 caracteres" else null,
-            ciudad = if (estadoActual.ciudad.isBlank()) "Debe ingresar una ciudad" else null
+            ciudad = if (estadoActual.ciudad.isBlank()) "Debe ingresar una ciudad" else null,
+            rut = if (estadoActual.rut.isBlank()) "Debe ingresar su rut" else null
         )
 
         val hayErrores = listOfNotNull(
             errores.nombre,
             errores.correo,
             errores.clave,
-            errores.ciudad
+            errores.ciudad,
+            errores.rut
         ).isNotEmpty()
 
         _estado.update { it.copy(errores = errores) }
