@@ -3,7 +3,7 @@ package com.medbusq.medbusq.viewmodel
 import androidx.lifecycle.ViewModel
 import com.medbusq.medbusq.model.MedicamentoErrores
 import com.medbusq.medbusq.model.MedicamentoUIState
-import com.medbusq.medbusq.model.UsuarioErrores
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
