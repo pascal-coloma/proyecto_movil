@@ -9,16 +9,16 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-
 import androidx.compose.foundation.layout.statusBars
-
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -26,9 +26,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-
 import androidx.compose.material3.TopAppBarDefaults
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.medbusq.medbusq.viewmodel.UsuarioViewModel
@@ -133,18 +130,48 @@ fun RegistroScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            OutlinedTextField(
-                value = estado.ciudad,
-                onValueChange = viewModel::onCiudadChange,
-                label = {Text("Ciudad")},
-                isError = estado.errores.ciudad != null,
-                supportingText = {
-                    estado.errores.ciudad?.let {
-                        Text(it, color = MaterialTheme.colorScheme.error)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth()
+            var expandedMenu by remember { mutableStateOf(false) }
+            val ciudades = mapOf(
+                1 to "Viña del Mar",
+                2 to "Valparaíso",
+                3 to "Chillán"
             )
+            ExposedDropdownMenuBox(
+                expanded = expandedMenu,
+                onExpandedChange = { expandedMenu = !expandedMenu },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                OutlinedTextField(
+                    value = estado.ciudad,
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Ciudad") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedMenu) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .menuAnchor(),
+                    isError = estado.errores.ciudad != null,
+                    supportingText = {
+                        estado.errores.ciudad?.let {
+                            Text(it, color = MaterialTheme.colorScheme.error)
+                        }
+                    }
+                )
+                ExposedDropdownMenu(
+                    expanded = expandedMenu,
+                    onDismissRequest = { expandedMenu = false }
+                ) {
+                    ciudades.forEach { (id, nombre) ->
+                        DropdownMenuItem(
+                            text = { Text(nombre) },
+                            onClick = {
+                                viewModel.onCiudadChange(nombre)
+                                expandedMenu = false
+                            }
+                        )
+                    }
+                }
+            }
             Row (verticalAlignment = Alignment.CenterVertically){
                 Checkbox(
                     checked = estado.terminos,
