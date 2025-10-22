@@ -94,6 +94,18 @@ fun RegistroScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
+                value = estado.rut,
+                onValueChange = viewModel::onRutChange,
+                label = {Text("RUT")},
+                isError = estado.errores.rut != null,
+                supportingText = {
+                    estado.errores.rut?.let{
+                        Text(it, color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
                 value = estado.correo,
                 onValueChange = viewModel::onCorreoChange,
                 label = {Text("Correo")},
