@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class MedicamentoViewModel : ViewModel() {
+open class MedicamentoViewModel : ViewModel() {
 
     private val baseMedicamentos = listOf(
         MedicamentoUIState("Paracetamol", "500mg, Tabletas"),
@@ -29,7 +29,7 @@ class MedicamentoViewModel : ViewModel() {
 
 
     private val _estado = MutableStateFlow(MedicamentoUIState())
-    private val _resultados = mutableStateListOf<MedicamentoUIState>()
+    public val _resultados = mutableStateListOf<MedicamentoUIState>()
 
     val estado : StateFlow<MedicamentoUIState> = _estado
 

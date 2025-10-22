@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -31,11 +32,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.medbusq.medbusq.model.MedicamentoUIState
 import com.medbusq.medbusq.viewmodel.MedicamentoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -102,28 +107,56 @@ fun Busqueda(
             ) {
                 Text("Buscar")
             }
-            LazyColumn {
-                items(5) { index ->
-                    Card (
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    ),
+            AnimatedVisibility(
+                visible = cargando,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                Column(
                     modifier = Modifier
-                        .size(width = 240.dp, height = 100.dp)
-                    ) {
-                    Text(
-                        text = "Nombre medicamento",
-                        modifier = Modifier
-                            .padding(16.dp),
-                        textAlign = TextAlign.Center
-                    )
-                        Text("Datos medicamento")
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    CircularProgressIndicator()
+                    Text("Buscando medicamentos")
                 }
-                    Spacer(modifier = Modifier.padding(5.dp))
+            }
+            AnimatedVisibility(
+                visible = !cargando && resultados.isNotEmpty(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                LazyColumn (
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp)
+                ) {
+                    items(resultados.size){ index ->
+                        val medicamento = resultados[index]
+                        Card(
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        ) {
+                            Column (modifier = Modifier.padding(16.dp)){
+                                Text(
+                                    text = medicamento.nombre,
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+                                Text(
+                                    text = medicamento.detalles,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            }
+                        }
+                    }
                 }
-
             }
         }
-
     }
 }
+
