@@ -32,6 +32,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -150,11 +153,30 @@ fun RegistroScreen(
                 Spacer(Modifier.width(8.dp))
                 Text("Acepto los terminos y condiciones")
             }
+            var mostrarError by remember { mutableStateOf(false) }
+            var mensajeError by remember { mutableStateOf("") }
+
+            if (mostrarError) {
+                Text(
+                    text = mensajeError,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+
             Button(
                 onClick = {
-                    if (viewModel.validarFormulario()) {
-                        navController.navigate("resumen")
-                    }
+                    viewModel.registrarUsuario(
+                        onSuccess = {
+                            navController.navigate("login") {
+                                popUpTo("RegistroScreen") { inclusive = true }
+                            }
+                        },
+                        onError = { error ->
+                            mostrarError = true
+                            mensajeError = error
+                        }
+                    )
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

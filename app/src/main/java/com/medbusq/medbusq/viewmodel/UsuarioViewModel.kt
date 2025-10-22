@@ -1,14 +1,20 @@
 package com.medbusq.medbusq.viewmodel
 
-import androidx.lifecycle.ViewModel
-
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.medbusq.medbusq.data.DatabaseProvider
+import com.medbusq.medbusq.data.Usuario
 import com.medbusq.medbusq.model.UsuarioErrores
 import com.medbusq.medbusq.model.UsuarioUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
-class UsuarioViewModel : ViewModel() {
+class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
+    private val database = DatabaseProvider.getDatabase(application)
+    private val usuarioDao = database.usuarioDao()
     private val _estado = MutableStateFlow(UsuarioUIState())
 
     val estado: StateFlow<UsuarioUIState> = _estado
@@ -60,4 +66,76 @@ class UsuarioViewModel : ViewModel() {
         return !hayErrores
     }
 
+    fun iniciarSesion(correo: String, clave: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                if (correo.isBlank()) {
+                    onError("El correo no puede estar vacío")
+                    return@launch
+                }
+                if (clave.isBlank()) {
+                    onError("La contraseña no puede estar vacía")
+                    return@launch
+                }
+
+                val usuario = usuarioDao.getByEmail(correo)
+                if (usuario == null) {
+                    onError("Usuario no encontrado")
+                    return@launch
+                }
+
+                if (usuario.clave != clave) {
+                    onError("Contraseña incorrecta")
+                    return@launch
+                }
+
+                _estado.update {
+                    it.copy(
+                        nombre = usuario.nombre,
+                        correo = usuario.correo,
+                        ciudad = usuario.ciudad,
+                        rut = usuario.rut
+                    )
+                }
+                onSuccess()
+            } catch (e: Exception) {
+                onError("Error al iniciar sesión: ${e.message}")
+            }
+        }
+    }
+
+    fun registrarUsuario(onSuccess: () -> Unit, onError: (String) -> Unit) {
+        if (!validarFormulario()) {
+            onError("Por favor, corrija los errores en el formulario")
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val usuarioExistente = usuarioDao.getByEmail(_estado.value.correo)
+                if (usuarioExistente != null) {
+                    onError("Ya existe un usuario con este correo electrónico")
+                    return@launch
+                }
+
+                val nuevoUsuario = Usuario(
+                    nombre = _estado.value.nombre,
+                    correo = _estado.value.correo,
+                    clave = _estado.value.clave,
+                    ciudad = _estado.value.ciudad,
+                    rut = _estado.value.rut
+                )
+
+                usuarioDao.insert(nuevoUsuario)
+                onSuccess()
+            } catch (e: Exception) {
+                onError("Error al registrar usuario: ${e.message}")
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        DatabaseProvider.closeDatabase()
+    }
 }
