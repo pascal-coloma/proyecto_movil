@@ -17,16 +17,17 @@ import kotlinx.coroutines.launch
 open class MedicamentoViewModel : ViewModel() {
 
     private val baseMedicamentos = listOf(
-        MedicamentoUIState("Paracetamol", "500mg, Tabletas"),
-        MedicamentoUIState("Ibuprofeno", "200mg, Cápsulas"),
-        MedicamentoUIState("Amoxicilina", "250mg, Suspensión"),
-        MedicamentoUIState("Omeprazol", "20mg, Cápsulas"),
-        MedicamentoUIState("Cetirizina", "10mg, Tabletas"),
-        MedicamentoUIState("Loratadina", "10mg, Tabletas"),
-        MedicamentoUIState("Metformina", "850mg, Tabletas"),
-        MedicamentoUIState("Losartán", "50mg, Tabletas")
+        MedicamentoUIState("Paracetamol", "500mg, Comprimidos", url = "https://www.cruzverde.cl/paracetamol-500-mg-16-comprimidos/272241.html"),
+        MedicamentoUIState("Paracetamol", "1gr, Comprimidos", url = "https://www.cruzverde.cl/xumadol-paracetamol-1000-mg-20-comprimidos/266145.html"),
+        MedicamentoUIState("Ibuprofeno", "400mg, Cápsulas", url = "https://www.cruzverde.cl/ibuprofeno-400-mg-20-comprimidos/273441.html"),
+        MedicamentoUIState("Ibuprofeno", "600mg, Cápsulas", url = "https://www.cruzverde.cl/ibuprofeno-600-mg-20-comprimidos/273362.html"),
+        MedicamentoUIState("Amoxicilina", "875mg, Comprimidos", url = "https://www.cruzverde.cl/zolimax-duo-875125-amoxicilina-875-mg-20-comprimidos/292269.html"),
+        MedicamentoUIState("Omeprazol", "20mg, Cápsulas", url = "https://www.cruzverde.cl/omeprazol-20-mg-30-capsulas-con-granulos/275886.html"),
+        MedicamentoUIState("Cetirizina", "10mg, Comprimidos", url = "https://www.cruzverde.cl/remitex-cetirizina-10-mg-30-comprimidos-recubierto/9118.html"),
+        MedicamentoUIState("Loratadina", "10mg, Comprimidos", url = "https://www.cruzverde.cl/loratadina-10-mg-30-comprimidos/273015.html"),
+        MedicamentoUIState("Metformina", "750mg, Comprimidos", url = "https://www.cruzverde.cl/glicenex-sr--metformina-750-mg-30-comprimidos/260681.html"),
+        MedicamentoUIState("Losartán", "50mg, Comprimidos", url = "https://www.cruzverde.cl/losartan-potasico-50-mg-30-comprimidos/268539.html")
     )
-
 
     private val _estado = MutableStateFlow(MedicamentoUIState())
     public val _resultados = mutableStateListOf<MedicamentoUIState>()
@@ -47,7 +48,7 @@ open class MedicamentoViewModel : ViewModel() {
         viewModelScope.launch {
             cargando.value = true
 
-            delay(1000)
+            delay(2000)
             val resultadosFiltrados = baseMedicamentos.filter {
                 it.nombre.lowercase().contains(nombre)
             }

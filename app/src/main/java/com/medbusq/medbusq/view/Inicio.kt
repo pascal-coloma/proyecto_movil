@@ -59,13 +59,11 @@ fun InicioScreen(
                 Text("Buscar Medicamentos")
             }
 
-            Button(onClick = {navController.navigate("RegistroScreen")}) {
-                Text("Registro")
+            Button(onClick = {navController.navigate("Perfil")}) {
+                Text("Perfil")
             }
 
         }
 
     }
-
-
 }

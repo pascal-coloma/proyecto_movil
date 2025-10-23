@@ -13,6 +13,7 @@ import com.medbusq.medbusq.view.RegistroScreen
 import com.medbusq.medbusq.view.ResumenScreen
 import com.medbusq.medbusq.view.InicioScreen
 import com.medbusq.medbusq.view.LoginScreen
+import com.medbusq.medbusq.view.Perfil
 import com.medbusq.medbusq.viewmodel.MedicamentoViewModel
 import com.medbusq.medbusq.viewmodel.UsuarioViewModel
 import com.medbusq.medbusq.viewmodel.UsuarioViewModelFactory
@@ -55,6 +56,11 @@ class MainActivity : ComponentActivity() {
                 composable ("resumen") {
                     ResumenScreen(
                         usuarioViewModel
+                    )
+                }
+                composable ("Perfil"){
+                    Perfil(
+                        navController
                     )
                 }
             }

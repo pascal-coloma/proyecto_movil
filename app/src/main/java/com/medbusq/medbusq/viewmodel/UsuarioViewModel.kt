@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import androidx.core.content.edit
+
 
 class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
     private val database = DatabaseProvider.getDatabase(application)
@@ -128,6 +130,8 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
 
                 usuarioDao.insert(nuevoUsuario)
                 onSuccess()
+                val prefs = getApplication<Application>().getSharedPreferences("sesion", android.content.Context.MODE_PRIVATE)
+                prefs.edit { putString("correo", _estado.value.correo) }
             } catch (e: Exception) {
                 onError("Error al registrar usuario: ${e.message}")
             }
@@ -137,5 +141,25 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     override fun onCleared() {
         super.onCleared()
         DatabaseProvider.closeDatabase()
+    }
+
+    fun traerUsuario(correo: String){
+        viewModelScope.launch {
+            try {
+                val usuario = usuarioDao.getByEmail(correo)
+                if (usuario != null) {
+                    _estado.update {
+                        it.copy(
+                            nombre = usuario.nombre,
+                            correo = usuario.correo,
+                            ciudad = usuario.ciudad,
+                            rut = usuario.rut
+                        )
+                    }
+                }
+            } catch (e: Exception){
+                e.printStackTrace()
+            }
+        }
     }
 }
