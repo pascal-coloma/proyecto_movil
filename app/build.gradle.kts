@@ -46,6 +46,9 @@ android {
 
 dependencies {
     val room_version = "2.8.1"
+    
+    // Coil para cargar imágenes
+    implementation("io.coil-kt:coil-compose:2.4.0")
 
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")

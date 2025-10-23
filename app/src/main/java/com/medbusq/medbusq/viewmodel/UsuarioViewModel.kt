@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 import android.content.Context
 import androidx.core.content.edit
 
-
 class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
+    private val PROFILE_IMAGE_KEY = "profile_image_uri"
     private val database = DatabaseProvider.getDatabase(application)
     private val usuarioDao = database.usuarioDao()
     private val sharedPreferences = application.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
@@ -168,8 +168,24 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
         return sharedPreferences.getString("userRut", "") ?: ""
     }
 
+    fun saveProfileImage(uri: String) {
+        sharedPreferences.edit()
+            .putString(PROFILE_IMAGE_KEY, uri)
+            .apply()
+    }
+
+    fun getProfileImage(): String {
+        return sharedPreferences.getString(PROFILE_IMAGE_KEY, "") ?: ""
+    }
+
     fun cerrarSesion() {
-        sharedPreferences.edit().clear().apply()
+        sharedPreferences.edit()
+            .remove("user_id")
+            .remove("user_name")
+            .remove("user_email")
+            .remove("user_ciudad")
+            .remove("user_rut")
+            .apply()
         _estado.update { UsuarioUIState() }
     }
 
