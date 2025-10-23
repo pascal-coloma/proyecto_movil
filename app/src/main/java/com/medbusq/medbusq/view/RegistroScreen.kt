@@ -131,10 +131,10 @@ fun RegistroScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             var expandedMenu by remember { mutableStateOf(false) }
-            val ciudades = mapOf(
-                1 to "Viña del Mar",
-                2 to "Valparaíso",
-                3 to "Chillán"
+            val ciudades = setOf(
+                "Vina del Mar",
+                "Valparaíso",
+                "Chillán"
             )
             ExposedDropdownMenuBox(
                 expanded = expandedMenu,
@@ -161,15 +161,15 @@ fun RegistroScreen(
                     expanded = expandedMenu,
                     onDismissRequest = { expandedMenu = false }
                 ) {
-                    ciudades.forEach { (id, nombre) ->
-                        DropdownMenuItem(
-                            text = { Text(nombre) },
-                            onClick = {
-                                viewModel.onCiudadChange(nombre)
-                                expandedMenu = false
-                            }
-                        )
-                    }
+                    ciudades.forEach { nombre ->
+                    DropdownMenuItem(
+                        text = { Text(nombre) },
+                        onClick = {
+                            viewModel.onCiudadChange(nombre)
+                            expandedMenu = false
+                        }
+                    )
+                }
                 }
             }
             Row (verticalAlignment = Alignment.CenterVertically){

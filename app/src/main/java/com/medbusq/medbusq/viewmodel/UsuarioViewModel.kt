@@ -11,12 +11,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.content.Context
 import androidx.core.content.edit
 
 
 class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
     private val database = DatabaseProvider.getDatabase(application)
     private val usuarioDao = database.usuarioDao()
+    private val sharedPreferences = application.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     private val _estado = MutableStateFlow(UsuarioUIState())
 
     val estado: StateFlow<UsuarioUIState> = _estado
@@ -91,6 +93,13 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
                     return@launch
                 }
 
+                sharedPreferences.edit()
+                    .putString("username", usuario.nombre)
+                    .putString("userMail", usuario.correo)
+                    .putString("userCiudad", usuario.ciudad)
+                    .putString("userRut", usuario.rut)
+                    .apply()
+
                 _estado.update {
                     it.copy(
                         nombre = usuario.nombre,
@@ -141,6 +150,27 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     override fun onCleared() {
         super.onCleared()
         DatabaseProvider.closeDatabase()
+    }
+
+    fun obtenerNombreUsuario(): String {
+        return sharedPreferences.getString("username", "") ?: ""
+    }
+
+    fun obtenerCorreoUsuario(): String {
+        return sharedPreferences.getString("userMail", "") ?: ""
+    }
+
+    fun obtenerciudadUsuario(): String {
+        return sharedPreferences.getString("userCiudad", "") ?: ""
+    }
+
+    fun obtenerRunUsuario(): String {
+        return sharedPreferences.getString("userRut", "") ?: ""
+    }
+
+    fun cerrarSesion() {
+        sharedPreferences.edit().clear().apply()
+        _estado.update { UsuarioUIState() }
     }
 
     fun traerUsuario(correo: String){

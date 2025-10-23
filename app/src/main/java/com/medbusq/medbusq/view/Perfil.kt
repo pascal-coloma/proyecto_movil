@@ -48,6 +48,7 @@ fun Perfil(
 {
     val estado by viewModel.estado.collectAsState()
 
+
     Scaffold (
         topBar = {
             CenterAlignedTopAppBar(
@@ -94,11 +95,19 @@ fun Perfil(
             ) {
                 Column (modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Nombre: ${estado.nombre}",
+                        text = "Nombre: ${viewModel.obtenerNombreUsuario()}",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "Ciudad: ${estado.ciudad}",
+                        text = "Run: ${viewModel.obtenerRunUsuario()}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Correo: ${viewModel.obtenerCorreoUsuario()}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Ciudad: ${viewModel.obtenerciudadUsuario()}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
