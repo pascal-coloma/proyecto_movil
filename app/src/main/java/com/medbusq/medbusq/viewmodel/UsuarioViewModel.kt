@@ -24,15 +24,25 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     val estado: StateFlow<UsuarioUIState> = _estado
 
     fun onNombreChange(valor: String){
-        _estado.update { it.copy(nombre = valor,errores = it.errores.copy(nombre = null)) }
+        val error = if (valor.length < 3) "Nombre muy corto" else null
+        _estado.update { it.copy(nombre = valor,errores = it.errores.copy(nombre = error)) }
     }
 
     fun onCorreoChange(valor: String){
-        _estado.update { it.copy(correo = valor, errores = it.errores.copy(correo = null)) }
+        val error = if (!android.util.Patterns.EMAIL_ADDRESS.matcher(valor).matches()) "Correo no valido" else null
+
+        _estado.update { it.copy(
+            correo = valor,
+            errores = it.errores.copy(correo = error)) }
     }
 
+    fun isPasswordValid(password: String): Boolean {
+        return Regex("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&._]{8,}\$")
+            .matches(password)
+    }
     fun onClaveChange(valor: String){
-        _estado.update { it.copy(clave = valor, errores = it.errores.copy(clave = null)) }
+        val error = if (!isPasswordValid(valor)) "Contrasenna no valida" else null
+        _estado.update { it.copy(clave = valor, errores = it.errores.copy(clave = error)) }
     }
 
     fun onCiudadChange(valor: String){
@@ -43,8 +53,34 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
         _estado.update { it.copy(terminos = valor) }
     }
 
+    fun rutFormatoValido(rut: String): Boolean {
+        val regex = Regex("^\\d{7,8}-[\\dkK]\$")
+        if (!regex.matches(rut)) return false
+
+        val (numero, dv) = rut.split("-")
+        val rutNum = numero.toInt()
+
+        // calculo dv algoritmo 11
+        var suma = 0
+        var multiplicador = 2
+
+        for (i in numero.reversed()) {
+            suma += (i.digitToInt() * multiplicador)
+            multiplicador = if (multiplicador == 7) 2 else multiplicador + 1
+        }
+
+        val resto = 11 - (suma % 11)
+        val dvCalculado = when (resto) {
+            11 -> "0"
+            10 -> "K"
+            else -> resto.toString()
+        }
+
+        return dv.equals(dvCalculado, ignoreCase = true)
+    }
     fun onRutChange(valor: String){
-        _estado.update { it.copy(rut = valor) }
+        val error = if (!rutFormatoValido(valor)) "Rut no valido" else null
+        _estado.update { it.copy(rut = valor, errores = it.errores.copy(rut = error)) }
     }
 
     fun validarFormulario():Boolean{

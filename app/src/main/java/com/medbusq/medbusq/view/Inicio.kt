@@ -1,7 +1,9 @@
 package com.medbusq.medbusq.view
 
+
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -33,7 +35,11 @@ fun InicioScreen(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text("MEDI BUSQUEDA", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, letterSpacing = 1.sp  )
+                   Row (verticalAlignment = Alignment.CenterVertically){
+
+                       Text("MEDI BUSQUEDA", fontFamily = FontFamily.Monospace, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, letterSpacing = 1.sp  )
+                   }
+
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0x7500B4D4),
