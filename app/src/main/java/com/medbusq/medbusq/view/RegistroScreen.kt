@@ -96,7 +96,7 @@ fun RegistroScreen(
             OutlinedTextField(
                 value = estado.rut,
                 onValueChange = viewModel::onRutChange,
-                label = {Text("RUT")},
+                label = {Text("Ingrese RUT con guion y sin puntos")},
                 isError = estado.errores.rut != null,
                 supportingText = {
                     estado.errores.rut?.let{

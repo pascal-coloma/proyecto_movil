@@ -18,11 +18,15 @@ class DatosViewModel : ViewModel(){
     }
 
     fun onCorreoChange(valor: String){
-        _estado.update { it.copy(correo = valor, errores = it.errores.copy(correo = null)) }
+        val error = if (!valor.contains("@")) "Correo no valido" else null
+
+        _estado.update { it.copy(
+            correo = valor,
+            errores = it.errores.copy(correo = error)) }
     }
 
     fun onPassChange(valor: String){
-        _estado.update { it.copy(contrasenna = valor, errores = it.errores.copy(contrasenna = null)) }
+        _estado.update { it.copy(clave = valor, errores = it.errores.copy(clave = null)) }
     }
 
     fun onTerminosChange(valor: Boolean){
@@ -34,13 +38,13 @@ class DatosViewModel : ViewModel(){
         val errores = DatosErrores(
             nombre = if (estadoActual.nombre.isBlank()) "Campo obligatorio" else null,
             correo = if (!estadoActual.correo.contains("@")) "Correo no valido" else null,
-            contrasenna = if (estadoActual.contrasenna.length < 8) "Debe tener al menos 8 caracteres" else null
+            clave = if (estadoActual.clave.length < 8) "Debe tener al menos 8 caracteres" else null
         )
 
         val hayErrores = listOfNotNull(
             errores.nombre,
             errores.correo,
-            errores.contrasenna
+            errores.clave
         ).isNotEmpty()
 
         _estado.update { it.copy(errores = errores) }
