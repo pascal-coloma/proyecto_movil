@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.content.Context
 import androidx.core.content.edit
+import androidx.datastore.core.IOException
+import okhttp3.OkHttpClient
+import okhttp3.Request
 
 class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
     private val PROFILE_IMAGE_KEY = "profile_image_uri"
@@ -20,6 +23,24 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     private val usuarioDao = database.usuarioDao()
     private val sharedPreferences = application.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     private val _estado = MutableStateFlow(UsuarioUIState())
+
+    private val client = OkHttpClient();
+
+    fun run() {
+        val request = Request.Builder()
+            .url("http://localhost:8080/medbusq/v1/usuario")
+            .build()
+
+        client.newCall(request).execute().use { response ->
+            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+
+            for ((name, value) in response.headers) {
+                println("$name: $value")
+            }
+
+            println(response.body!!.string())
+        }
+    }
 
     val estado: StateFlow<UsuarioUIState> = _estado
 

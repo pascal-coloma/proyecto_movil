@@ -39,7 +39,8 @@ class MainActivity : ComponentActivity() {
                 }
                 composable("Inicio") {
                     InicioScreen(
-                        navController
+                        navController,
+                        usuarioViewModel
                     )
                 }
                 composable ("Busqueda"){
