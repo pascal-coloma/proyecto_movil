@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.content.Context
+import android.util.Log
 import androidx.core.content.edit
 import androidx.datastore.core.IOException
+import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
 import okhttp3.Request
 
@@ -27,18 +29,26 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     private val client = OkHttpClient();
 
     fun run() {
-        val request = Request.Builder()
-            .url("http://localhost:8080/medbusq/v1/usuario")
-            .build()
+        viewModelScope.launch(Dispatchers.IO) {
+            val url = "http://10.0.2.2:8080/medbusq/v1/usuario"
+            val request = Request.Builder().url(url).build()
 
-        client.newCall(request).execute().use { response ->
-            if (!response.isSuccessful) throw IOException("Unexpected code $response")
+            try {
+                Log.d("UsuarioVM", "Intentando conectar con $url")
+                client.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        Log.e("UsuarioVM", "Error HTTP: ${response.code}")
+                        return@use
+                    }
 
-            for ((name, value) in response.headers) {
-                println("$name: $value")
+                    val body = response.body?.string()
+                    Log.d("UsuarioVM", "Respuesta exitosa: $body")
+                }
+            } catch (e: IOException) {
+                Log.e("UsuarioVM", "Error de red: ${e.message}", e)
+            } catch (e: Exception) {
+                Log.e("UsuarioVM", "Error inesperado: ${e.message}", e)
             }
-
-            println(response.body!!.string())
         }
     }
 

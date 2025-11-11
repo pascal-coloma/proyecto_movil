@@ -30,8 +30,8 @@ import com.medbusq.medbusq.viewmodel.UsuarioViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InicioScreen(
-    navController: NavController,
-    viewModel: UsuarioViewModel){
+    navController: NavController)
+    {
 
     Scaffold (
         topBar = {
@@ -71,9 +71,7 @@ fun InicioScreen(
                 Text("Perfil")
             }
 
-            Button(onClick = { viewModel.run() }) {
-                Text("Datos")
-            }
+
 
         }
 
