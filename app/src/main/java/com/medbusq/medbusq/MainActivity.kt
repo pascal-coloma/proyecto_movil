@@ -60,7 +60,8 @@ class MainActivity : ComponentActivity() {
                 }
                 composable ("Perfil"){
                     Perfil(
-                        navController
+                        navController,
+                        usuarioViewModel
                     )
                 }
             }

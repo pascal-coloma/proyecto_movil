@@ -3,14 +3,12 @@ package com.medbusq.medbusq.viewmodel
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.medbusq.medbusq.data.model.Ciudad
 import com.medbusq.medbusq.data.model.Medicamento
 import com.medbusq.medbusq.data.model.MedicamentoErrores
 import com.medbusq.medbusq.data.model.MedicamentoUIState
 import com.medbusq.medbusq.data.remote.RetrofitInstance
 import com.medbusq.medbusq.data.remote.dto.CiudadDto
 import com.medbusq.medbusq.data.remote.dto.MedicamentoBusquedaRequest
-import com.medbusq.medbusq.data.remote.dto.MedicamentoDto
 import com.medbusq.medbusq.data.remote.dto.toModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

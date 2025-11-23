@@ -58,8 +58,9 @@ import com.medbusq.medbusq.viewmodel.UsuarioViewModel
 @Composable
 fun Perfil(
     navController: NavController,
-    viewModel: UsuarioViewModel = viewModel())
+    viewModel: UsuarioViewModel)
 {
+
     val estado by viewModel.estado.collectAsState()
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     
@@ -71,7 +72,7 @@ fun Perfil(
         }
     }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(estado) {
         //tengo que ver que hago con la imagen
     }
 
@@ -140,22 +141,7 @@ fun Perfil(
                 Text("Cambiar foto de perfil")
             }
             
-            Button(
-                onClick = {
-                    viewModel.cerrarSesion()
-                    navController.navigate("login") {
-                        popUpTo("perfil") { inclusive = true }
-                    }
-                },
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-                    .fillMaxWidth(),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
-                )
-            ) {
-                Text("Cerrar Sesión")
-            }
+
             Card(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -166,7 +152,7 @@ fun Perfil(
             ) {
                 Column (modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Nombre: ${estado.nombre}",
+                        text = "Nombre: ${estado.pnombre}",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
@@ -182,6 +168,21 @@ fun Perfil(
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
+            }
+            Button(
+                onClick = {
+                    viewModel.cerrarSesion()
+                    navController.navigate("login") {
+                        popUpTo("perfil") { inclusive = true }
+                    }
+                },
+                modifier = Modifier
+                    .padding(vertical = 8.dp),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Color.Red
+                )
+            ) {
+                Text("Cerrar Sesión")
             }
 
         }
