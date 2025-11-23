@@ -1,4 +1,4 @@
-package com.medbusq.medbusq.model
+package com.medbusq.medbusq.data.model
 
 data class MedicamentoErrores (
     val nombre: String ?= null,

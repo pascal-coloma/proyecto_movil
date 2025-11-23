@@ -30,9 +30,8 @@ fun ResumenScreen(viewModel: UsuarioViewModel){
         verticalArrangement = Arrangement.Top)
     {
         Text("Resumen de registro", style = MaterialTheme.typography.headlineMedium)
-        Text("Nombre: ${estado.nombre}")
+        Text("Nombre: ${estado.pnombre}")
         Text("Correo: ${estado.correo}")
-        Text("Ciudad: ${estado.ciudad}")
         Text("Contrasenna: ${"*".repeat(estado.clave.length)}")
         Text("Terminos aceptados?: ${if (estado.terminos) "Aceptados" else "Rechazados"}")
     }

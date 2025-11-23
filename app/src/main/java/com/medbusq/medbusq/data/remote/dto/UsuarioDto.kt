@@ -1,11 +1,6 @@
-package com.medbusq.medbusq.data
+package com.medbusq.medbusq.data.remote.dto
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
-
-@Entity(tableName = "usuarios")
-data class Usuario(
-    @PrimaryKey
+class UsuarioDto (
     val rut: String,
     val dv_rut: String,
     val pnombre: String,
@@ -14,4 +9,5 @@ data class Usuario(
     val amaterno: String,
     val correo: String,
     val clave: String
-)
+){
+}

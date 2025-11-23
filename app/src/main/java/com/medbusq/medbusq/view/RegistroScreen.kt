@@ -82,9 +82,21 @@ fun RegistroScreen(
             verticalArrangement = Arrangement.Top
         ){
             OutlinedTextField(
-                value = estado.nombre,
+                value = estado.pnombre,
                 onValueChange = viewModel::onNombreChange,
                 label = { Text("Nombre") },
+                isError = estado.errores.nombre != null,
+                supportingText = {
+                    estado.errores.nombre?.let {
+                        Text(it,color = MaterialTheme.colorScheme.error)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            )
+            OutlinedTextField(
+                value = estado.snombre,
+                onValueChange = viewModel::onNombreChange,
+                label = { Text("Segundo nombre") },
                 isError = estado.errores.nombre != null,
                 supportingText = {
                     estado.errores.nombre?.let {
@@ -136,7 +148,7 @@ fun RegistroScreen(
                 "Valparaíso",
                 "Chillán"
             )
-            ExposedDropdownMenuBox(
+            /*ExposedDropdownMenuBox(
                 expanded = expandedMenu,
                 onExpandedChange = { expandedMenu = !expandedMenu },
                 modifier = Modifier.fillMaxWidth()
@@ -171,7 +183,7 @@ fun RegistroScreen(
                     )
                 }
                 }
-            }
+            }*/
             Row (verticalAlignment = Alignment.CenterVertically){
                 Checkbox(
                     checked = estado.terminos,

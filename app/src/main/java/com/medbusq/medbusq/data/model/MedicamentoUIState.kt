@@ -1,4 +1,4 @@
-package com.medbusq.medbusq.model
+package com.medbusq.medbusq.data.model
 
 data class MedicamentoUIState(
     val nombre: String = "",

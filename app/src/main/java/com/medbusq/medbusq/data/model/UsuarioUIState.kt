@@ -1,4 +1,4 @@
-package com.medbusq.medbusq.model
+package com.medbusq.medbusq.data.model
 
 data class UsuarioUIState (
     val rut: String = "",
@@ -10,6 +10,7 @@ data class UsuarioUIState (
     val correo: String = "",
     val clave: String = "",
     val confirmClave: String = "",
+    val ciudad: String = "",
     val terminos: Boolean = false,
     val errores: UsuarioErrores = UsuarioErrores()
 ){

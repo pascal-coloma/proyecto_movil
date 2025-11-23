@@ -5,19 +5,15 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.medbusq.medbusq.data.DatabaseProvider
 import com.medbusq.medbusq.data.Usuario
-import com.medbusq.medbusq.model.UsuarioErrores
-import com.medbusq.medbusq.model.UsuarioUIState
+import com.medbusq.medbusq.data.model.UsuarioErrores
+import com.medbusq.medbusq.data.model.UsuarioUIState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import android.content.Context
-import android.util.Log
 import androidx.core.content.edit
-import androidx.datastore.core.IOException
-import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
-import okhttp3.Request
 
 class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
     private val PROFILE_IMAGE_KEY = "profile_image_uri"
@@ -28,35 +24,11 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
 
     private val client = OkHttpClient();
 
-    fun run() {
-        viewModelScope.launch(Dispatchers.IO) {
-            val url = "http://10.0.2.2:8080/medbusq/v1/usuario"
-            val request = Request.Builder().url(url).build()
-
-            try {
-                Log.d("UsuarioVM", "Intentando conectar con $url")
-                client.newCall(request).execute().use { response ->
-                    if (!response.isSuccessful) {
-                        Log.e("UsuarioVM", "Error HTTP: ${response.code}")
-                        return@use
-                    }
-
-                    val body = response.body?.string()
-                    Log.d("UsuarioVM", "Respuesta exitosa: $body")
-                }
-            } catch (e: IOException) {
-                Log.e("UsuarioVM", "Error de red: ${e.message}", e)
-            } catch (e: Exception) {
-                Log.e("UsuarioVM", "Error inesperado: ${e.message}", e)
-            }
-        }
-    }
-
     val estado: StateFlow<UsuarioUIState> = _estado
 
     fun onNombreChange(valor: String){
         val error = if (valor.length < 3) "Nombre muy corto" else null
-        _estado.update { it.copy(nombre = valor,errores = it.errores.copy(nombre = error)) }
+        _estado.update { it.copy(pnombre = valor,errores = it.errores.copy(nombre = error)) }
     }
 
     fun onCorreoChange(valor: String){
@@ -76,9 +48,9 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
         _estado.update { it.copy(clave = valor, errores = it.errores.copy(clave = error)) }
     }
 
-    fun onCiudadChange(valor: String){
+    /*fun onCiudadChange(valor: String){
         _estado.update { it.copy(ciudad = valor, errores = it.errores.copy(ciudad = null))}
-    }
+    }*/
 
     fun onTerminosChange(valor: Boolean){
         _estado.update { it.copy(terminos = valor) }
@@ -117,10 +89,10 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     fun validarFormulario():Boolean{
         val estadoActual = _estado.value
         val errores = UsuarioErrores(
-            nombre = if (estadoActual.nombre.isBlank()) "Debe ingresar el Nombre" else null,
+            nombre = if (estadoActual.pnombre.isBlank()) "Debe ingresar el Nombre" else null,
             correo = if (!estadoActual.correo.contains(("@"))) "Correo no valido" else null,
             clave = if  (estadoActual.clave.length < 8) "Contrasenna debe tener al menos 8 caracteres" else null,
-            ciudad = if (estadoActual.ciudad.isBlank()) "Debe ingresar una ciudad" else null,
+            /*ciudad = if (estadoActual.ciudad.isBlank()) "Debe ingresar una ciudad" else null,*/
             rut = if (estadoActual.rut.isBlank()) "Debe ingresar su rut" else null
         )
 
@@ -128,7 +100,7 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
             errores.nombre,
             errores.correo,
             errores.clave,
-            errores.ciudad,
+            /*errores.ciudad,*/
             errores.rut
         ).isNotEmpty()
 
@@ -161,17 +133,16 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
                 }
 
                 sharedPreferences.edit()
-                    .putString("username", usuario.nombre)
+                    .putString("username", usuario.pnombre)
                     .putString("userMail", usuario.correo)
-                    .putString("userCiudad", usuario.ciudad)
+                    /*.putString("userCiudad", usuario.ciudad)*/
                     .putString("userRut", usuario.rut)
                     .apply()
 
                 _estado.update {
                     it.copy(
-                        nombre = usuario.nombre,
+                        pnombre = usuario.pnombre,
                         correo = usuario.correo,
-                        ciudad = usuario.ciudad,
                         rut = usuario.rut
                     )
                 }
@@ -197,11 +168,14 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
                 }
 
                 val nuevoUsuario = Usuario(
-                    nombre = _estado.value.nombre,
+                    rut = _estado.value.rut,
+                    dv_rut = _estado.value.dv_rut,
+                    pnombre = _estado.value.pnombre,
+                    snombre = _estado.value.snombre,
+                    apaterno = _estado.value.apaterno,
+                    amaterno = _estado.value.amaterno,
                     correo = _estado.value.correo,
-                    clave = _estado.value.clave,
-                    ciudad = _estado.value.ciudad,
-                    rut = _estado.value.rut
+                    clave = _estado.value.clave
                 )
 
                 usuarioDao.insert(nuevoUsuario)
@@ -263,9 +237,9 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
                 if (usuario != null) {
                     _estado.update {
                         it.copy(
-                            nombre = usuario.nombre,
+                            pnombre = usuario.pnombre,
                             correo = usuario.correo,
-                            ciudad = usuario.ciudad,
+
                             rut = usuario.rut
                         )
                     }

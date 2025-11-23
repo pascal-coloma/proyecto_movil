@@ -51,6 +51,8 @@ dependencies {
     // Coil para cargar imágenes
     implementation("io.coil-kt:coil-compose:2.7.0")
 
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
     kapt("androidx.room:room-compiler:$room_version")

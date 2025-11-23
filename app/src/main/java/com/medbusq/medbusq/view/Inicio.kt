@@ -23,8 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.medbusq.medbusq.model.UsuarioUIState
-import com.medbusq.medbusq.viewmodel.UsuarioViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)

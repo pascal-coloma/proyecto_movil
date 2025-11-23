@@ -96,8 +96,6 @@ fun LoginScreen(
         ) {
             Text("¿No tienes cuenta? Regístrate")
         }
-        Button(onClick = { viewModel.run() }) {
-            Text("Datos")
-        }
+
     }
 }

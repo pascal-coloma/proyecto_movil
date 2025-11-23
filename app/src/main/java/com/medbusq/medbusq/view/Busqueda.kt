@@ -1,27 +1,23 @@
 package com.medbusq.medbusq.view
 
-import android.content.Intent
-import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -37,13 +33,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.medbusq.medbusq.model.MedicamentoUIState
 import com.medbusq.medbusq.viewmodel.MedicamentoViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,20 +43,16 @@ fun Busqueda(
     navController: NavController,
     viewModel: MedicamentoViewModel
 ) {
-
     val estado by viewModel.estado.collectAsState()
-    val resultados = viewModel.resultados
+    val resultados by viewModel.resultados.collectAsState()
     val cargando = viewModel.cargando.value
-    val ctx = LocalContext.current
 
-    Scaffold (
+    Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text("Buscar Medicamentos")
-                },
+                title = { Text("Buscar Medicamentos") },
                 navigationIcon = {
-                    IconButton(onClick = {navController.popBackStack()}) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Volver"
@@ -80,8 +67,8 @@ fun Busqueda(
                 windowInsets = WindowInsets.statusBars
             )
         }
-    ) {
-        innerPadding ->
+    ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -101,16 +88,20 @@ fun Busqueda(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+
             Button(
                 onClick = {
-                    if (viewModel.validarFormulario()){
+                    if (viewModel.validarFormulario()) {
                         viewModel.buscarMedicamentos()
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
             ) {
                 Text("Buscar")
             }
+
             AnimatedVisibility(
                 visible = cargando,
                 enter = fadeIn(),
@@ -123,50 +114,45 @@ fun Busqueda(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     CircularProgressIndicator()
-                    Text("Buscando medicamentos")
+                    Text("Buscando medicamentos...")
                 }
             }
-            AnimatedVisibility(
-                visible = !cargando && resultados.isNotEmpty(),
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                LazyColumn (
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp)
-                ) {
-                    items(resultados.size){ index ->
-                        val medicamento = resultados[index]
-                        Card(
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 4.dp)
-                        ) {
-                            Column (modifier = Modifier.padding(16.dp)){
-                                Text(
-                                    text = medicamento.nombre,
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                                Text(
-                                    text = medicamento.detalles,
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                            Column (modifier = Modifier.padding(16.dp)){
-                                Button(onClick = {
-                                    val urlIntent = Intent(
-                                        Intent.ACTION_VIEW,
-                                        Uri.parse(medicamento.url)
-                                    )
-                                    ctx.startActivity(urlIntent)
-                                },
-                                    modifier  = Modifier.fillMaxWidth())  {
-                                    Text("Comprar")
 
+            if (!cargando) {
+                if (resultados.isEmpty()) {
+                    Text(
+                        text = "No se encontraron medicamentos.",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                } else {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp)
+                    ) {
+                        items(
+                            items = resultados,
+                            key = { it.id }
+                        ) { medicamento ->
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                ),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp)
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp)) {
+                                    Text(
+                                        text = "Nombre: ${medicamento.nombre}",
+                                        style = MaterialTheme.typography.titleMedium
+                                    )
+                                    Text("Laboratorio: ${medicamento.laboratorio}")
+                                    Text("Presentación: ${medicamento.presentacion}")
+                                    Text("Forma farmacéutica: ${medicamento.formaFarmaceutica}")
                                 }
                             }
                         }
@@ -176,4 +162,3 @@ fun Busqueda(
         }
     }
 }
-
