@@ -39,7 +39,7 @@ fun LoginScreen(
                 correo = it
                 mostrarError = false
             },
-            label = { Text("Correo electrónico") },
+            label = { Text("RUT sin digito verificador") },
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()

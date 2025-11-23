@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.medbusq.medbusq.viewmodel.UsuarioViewModel
 
+
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -83,7 +84,7 @@ fun RegistroScreen(
         ){
             OutlinedTextField(
                 value = estado.pnombre,
-                onValueChange = viewModel::onNombreChange,
+                onValueChange = viewModel::onPnombreChange,
                 label = { Text("Nombre") },
                 isError = estado.errores.nombre != null,
                 supportingText = {
@@ -95,7 +96,7 @@ fun RegistroScreen(
             )
             OutlinedTextField(
                 value = estado.snombre,
-                onValueChange = viewModel::onNombreChange,
+                onValueChange = viewModel::onSnombreChange,
                 label = { Text("Segundo nombre") },
                 isError = estado.errores.nombre != null,
                 supportingText = {

@@ -68,15 +68,11 @@ fun Perfil(
     ) { uri: Uri? ->
         uri?.let {
             imageUri = it
-            viewModel.saveProfileImage(it.toString())
         }
     }
 
     LaunchedEffect(Unit) {
-        val savedImageUri = viewModel.getProfileImage()
-        if (savedImageUri.isNotEmpty()) {
-            imageUri = Uri.parse(savedImageUri)
-        }
+        //tengo que ver que hago con la imagen
     }
 
 
@@ -143,6 +139,23 @@ fun Perfil(
             ) {
                 Text("Cambiar foto de perfil")
             }
+            
+            Button(
+                onClick = {
+                    viewModel.cerrarSesion()
+                    navController.navigate("login") {
+                        popUpTo("perfil") { inclusive = true }
+                    }
+                },
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .fillMaxWidth(),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = Color.Red
+                )
+            ) {
+                Text("Cerrar Sesión")
+            }
             Card(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
@@ -153,19 +166,19 @@ fun Perfil(
             ) {
                 Column (modifier = Modifier.padding(16.dp)) {
                     Text(
-                        text = "Nombre: ${viewModel.obtenerNombreUsuario()}",
+                        text = "Nombre: ${estado.nombre}",
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        text = "Run: ${viewModel.obtenerRunUsuario()}",
+                        text = "Run: ${estado.rut}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "Correo: ${viewModel.obtenerCorreoUsuario()}",
+                        text = "Correo: ${estado.correo}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "Ciudad: ${viewModel.obtenerciudadUsuario()}",
+                        text = "Ciudad: ${estado.ciudad}",
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
