@@ -1,6 +1,7 @@
 package com.medbusq.medbusq.data.remote.dto
 
 import com.medbusq.medbusq.data.Usuario
+import com.medbusq.medbusq.data.model.Ciudad
 import com.medbusq.medbusq.data.model.Medicamento
 import com.medbusq.medbusq.data.model.UsuarioUIState
 
@@ -60,8 +61,17 @@ fun UsuarioUIState.toDto(): UsuarioDto =
 fun MedicamentoDto.toModel(): Medicamento =
     Medicamento(
         id = id,
-        nombre = nombre,
+        nombreMedicamento = nombreMedicamento,
         laboratorio = laboratorio,
         presentacion = presentacion,
         formaFarmaceutica = formaFarmaceutica
     )
+
+fun CiudadDto.toModel(): Ciudad =
+    Ciudad(
+        id_ciudad = id_ciudad,
+        nombre = nombre,
+        latitud = latitud,
+        longitud = longitud
+    )
+

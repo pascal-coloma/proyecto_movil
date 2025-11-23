@@ -18,7 +18,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,14 +30,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.medbusq.medbusq.viewmodel.MedicamentoViewModel
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+
+import kotlin.math.exp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,9 +53,18 @@ fun Busqueda(
     navController: NavController,
     viewModel: MedicamentoViewModel
 ) {
+
     val estado by viewModel.estado.collectAsState()
     val resultados by viewModel.resultados.collectAsState()
     val cargando = viewModel.cargando.value
+
+    val ciudades by viewModel.ciudades.collectAsState()
+    val ciudadSeleccionada by viewModel.ciudadSeleccionada.collectAsState()
+
+    var expanded by remember { mutableStateOf(false) }
+    LaunchedEffect(ciudades) {
+        println("CIUDADES RECIBIDAS: ${ciudades.size}")
+    }
 
     Scaffold(
         topBar = {
@@ -88,12 +107,44 @@ fun Busqueda(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { if (ciudades.isNotEmpty()) {expanded = !expanded} }
+            ) {
 
+                OutlinedTextField(
+                    value = ciudadSeleccionada?.nombre ?: "",
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Ciudad") },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth(),
+
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    ciudades.forEach { c ->
+                        DropdownMenuItem(
+                            text = { Text(c.nombre) },
+                            onClick = {
+                                viewModel.seleccionarCiudad(c)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
             Button(
                 onClick = {
                     if (viewModel.validarFormulario()) {
-                        viewModel.buscarMedicamentos()
-                    }
+                    viewModel.buscarMedicamentos()}
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -147,12 +198,12 @@ fun Busqueda(
                             ) {
                                 Column(modifier = Modifier.padding(16.dp)) {
                                     Text(
-                                        text = "Nombre: ${medicamento.nombre}",
+                                        text = "Nombre: ${medicamento.nombreMedicamento ?: "-"}",
                                         style = MaterialTheme.typography.titleMedium
                                     )
-                                    Text("Laboratorio: ${medicamento.laboratorio}")
-                                    Text("Presentación: ${medicamento.presentacion}")
-                                    Text("Forma farmacéutica: ${medicamento.formaFarmaceutica}")
+                                    Text("Laboratorio: ${medicamento.laboratorio ?: "-"}")
+                                    Text("Presentación: ${medicamento.presentacion ?: "-"}")
+                                    Text("Forma farmacéutica: ${medicamento.formaFarmaceutica ?: "-"}")
                                 }
                             }
                         }
