@@ -98,9 +98,9 @@ fun RegistroScreen(
                 value = estado.snombre,
                 onValueChange = viewModel::onSnombreChange,
                 label = { Text("Segundo nombre") },
-                isError = estado.errores.nombre != null,
+                isError = estado.errores.snombre != null,
                 supportingText = {
-                    estado.errores.nombre?.let {
+                    estado.errores.snombre?.let {
                         Text(it,color = MaterialTheme.colorScheme.error)
                     }
                 },
@@ -143,48 +143,6 @@ fun RegistroScreen(
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            var expandedMenu by remember { mutableStateOf(false) }
-            val ciudades = setOf(
-                "Vina del Mar",
-                "Valparaíso",
-                "Chillán"
-            )
-            /*ExposedDropdownMenuBox(
-                expanded = expandedMenu,
-                onExpandedChange = { expandedMenu = !expandedMenu },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                OutlinedTextField(
-                    value = estado.ciudad,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Ciudad") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedMenu) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .menuAnchor(),
-                    isError = estado.errores.ciudad != null,
-                    supportingText = {
-                        estado.errores.ciudad?.let {
-                            Text(it, color = MaterialTheme.colorScheme.error)
-                        }
-                    }
-                )
-                ExposedDropdownMenu(
-                    expanded = expandedMenu,
-                    onDismissRequest = { expandedMenu = false }
-                ) {
-                    ciudades.forEach { nombre ->
-                    DropdownMenuItem(
-                        text = { Text(nombre) },
-                        onClick = {
-                            viewModel.onCiudadChange(nombre)
-                            expandedMenu = false
-                        }
-                    )
-                }
-                }
-            }*/
             Row (verticalAlignment = Alignment.CenterVertically){
                 Checkbox(
                     checked = estado.terminos,

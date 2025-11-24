@@ -1,6 +1,7 @@
 package com.medbusq.medbusq.viewmodel
 
 import android.app.Application
+import android.util.Patterns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.medbusq.medbusq.data.model.UsuarioErrores
@@ -20,30 +21,73 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     val estado: StateFlow<UsuarioUIState> = _estado
 
     fun onPnombreChange(valor: String){
+        val errorNombre =
+            if (valor.isBlank() || valor.length < 3)
+                "Nombre de longitud invalida"
+            else
+                null
         _estado.update { currentState ->
             currentState.copy(
                 pnombre = valor,
-                errores = currentState.errores.copy(nombre = null)
+                errores = currentState.errores.copy(nombre = errorNombre)
             )
         }
     }
 
     fun onSnombreChange(valor: String){
+        val errorNombre =
+            if (valor.isEmpty())
+                null
+            else if (valor.length < 3) {
+                "Segundo nombre muy corto"
+            } else {
+                null
+            }
         _estado.update { currentState ->
             currentState.copy(
                 snombre = valor,
-                errores = currentState.errores.copy(nombre = null)
+                errores = currentState.errores.copy(snombre = errorNombre)
             )
         }
     }
 
-    fun onCorreoChange(valor: String){
-        _estado.update { it.copy(correo = valor, errores = it.errores.copy(correo = null)) }
+    fun onCorreoChange(valor: String) {
+        val errorCorreo =
+            when {
+                valor.isBlank() ->
+                    "El correo no puede estar vacío"
+                !Patterns.EMAIL_ADDRESS.matcher(valor).matches() ->
+                    "Correo no válido"
+                else ->
+                    null
+            }
+        _estado.update {
+            it.copy(
+                correo = valor,
+                errores = it.errores.copy(correo = errorCorreo)
+            )
+        }
     }
 
-    fun onClaveChange(valor: String){
-        _estado.update { it.copy(clave = valor, errores = it.errores.copy(clave = null)) }
+
+    fun onClaveChange(valor: String) {
+        val errorClave =
+            when {
+                valor.isBlank() ->
+                    "La contraseña no puede estar vacía"
+                valor.length < 8 ->
+                    "La contraseña debe tener al menos 8 caracteres"
+                else ->
+                    null
+            }
+        _estado.update {
+            it.copy(
+                clave = valor,
+                errores = it.errores.copy(clave = errorClave)
+            )
+        }
     }
+
 
     fun onCiudadChange(valor: String){
         _estado.update { it.copy(ciudad = valor, errores = it.errores.copy(ciudad = null))}
@@ -53,14 +97,97 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
         _estado.update { it.copy(terminos = valor) }
     }
 
-    fun onRutChange(valor: String){
-        _estado.update { it.copy(rut = valor) }
+    private fun validarRutModulo11(rutSinDv: String, dv: Char): Boolean {
+        var factor = 2
+        var suma = 0
+
+        // Recorremos los dígitos de derecha a izquierda
+        for (i in rutSinDv.length - 1 downTo 0) {
+            val digito = rutSinDv[i] - '0'
+            suma += digito * factor
+            factor++
+            if (factor > 7) factor = 2
+        }
+
+        val resto = suma % 11
+        val resultado = 11 - resto
+
+        val dvEsperado = when (resultado) {
+            11 -> '0'
+            10 -> 'K'
+            else -> ('0' + resultado)
+        }
+
+        return dvEsperado == dv
     }
+
+
+    fun onRutChange(valor: String) {
+        val rut = valor.uppercase()
+        val errorRut: String? = when {
+            rut.isBlank() ->
+                "Debe ingresar su RUT"
+            !rut.matches(Regex("^[0-9K-]*$")) ->
+                "Formato inválido: solo números, guion y K"
+            rut.count { it == '-' } > 1 ->
+                "Formato inválido: solo un guion"
+
+            else -> {
+                val partes = rut.split('-')
+
+                when (partes.size) {
+                    1 -> {
+                        // Todavía no escribe el guion: deben ser solo dígitos, máximo 8
+                        val cuerpo = partes[0]
+                        when {
+                            !cuerpo.matches(Regex("^\\d{0,8}$")) ->
+                                "Los primeros dígitos deben ser números"
+
+                            else -> null   // Hasta aquí, formato bien mientras escribe
+                        }
+                    }
+                    2 -> {
+                        val cuerpo = partes[0]
+                        val dvStr = partes[1]
+
+                        when {
+                            !cuerpo.matches(Regex("^\\d{1,8}$")) ->
+                                "Los primeros dígitos deben ser números"
+                            dvStr.length > 1 ->
+                                "El dígito verificador es solo un carácter"
+                            dvStr.isEmpty() ->
+                                null
+                            !dvStr.matches(Regex("^[0-9K]$")) ->
+                                "Dígito verificador inválido"
+                            else -> {
+                                val dvChar = dvStr[0]
+                                val esValido = validarRutModulo11(cuerpo, dvChar)
+                                if (!esValido) "RUT inválido"
+                                else null
+                            }
+                        }
+                    }
+
+                    else -> "Formato inválido"
+                }
+            }
+        }
+
+        _estado.update {
+            it.copy(
+                rut = rut,
+                errores = it.errores.copy(rut = errorRut)
+            )
+        }
+    }
+
+
+
 
     fun validarFormulario():Boolean{
         val estadoActual = _estado.value
         val errores = UsuarioErrores(
-            nombre = if (estadoActual.nombre.isBlank()) "Debe ingresar el Nombre" else null,
+            nombre = if (estadoActual.pnombre.length < 3) "Nombre de longitud invalida" else null,
             correo = if (!estadoActual.correo.contains(("@"))) "Correo no valido" else null,
             clave = if  (estadoActual.clave.length < 8) "Contrasenna debe tener al menos 8 caracteres" else null,
             ciudad = if (estadoActual.ciudad.isBlank()) "Debe ingresar una ciudad" else null,
@@ -80,11 +207,11 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
         return !hayErrores
     }
 
-    fun iniciarSesion(correo: String, clave: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
+    fun iniciarSesion(rut: String, clave: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
             try {
-                if (correo.isBlank()) {
-                    onError("El correo no puede estar vacío")
+                if (rut.length < 8) {
+                    onError("Rut no valido")
                     return@launch
                 }
                 if (clave.isBlank()) {
@@ -93,7 +220,7 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
                 }
 
                 // Obtener usuario del backend usando el repositorio
-                val usuario = usuarioRepository.getUsuario(correo)
+                val usuario = usuarioRepository.getUsuario(rut)
                 
                 if (usuario.clave != clave) {
                     onError("Contraseña incorrecta")

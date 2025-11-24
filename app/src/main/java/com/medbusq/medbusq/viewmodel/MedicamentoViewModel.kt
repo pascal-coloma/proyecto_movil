@@ -58,11 +58,18 @@ class MedicamentoViewModel : ViewModel() {
         }
     }
 
-    fun onNombreChange(valor: String) {
-        _estado.update {
-            it.copy(
+    private fun validarNombreMedicamento(valor: String): String? =
+        if (valor.isBlank()) "Debe ingresar el nombre" else null
+    fun  onNombreChange(valor: String) {
+        val errorNombre =
+            if (valor.isBlank() || valor.length < 3)
+                "Nombre de medicamento no valido"
+            else
+                null
+        _estado.update { currentState ->
+            currentState.copy(
                 nombre = valor,
-                errores = it.errores.copy(nombre = null)
+                errores = currentState.errores.copy(nombre = errorNombre)
             )
         }
     }
@@ -87,8 +94,6 @@ class MedicamentoViewModel : ViewModel() {
                     longitud = lon,
                     nombreMedicamento = estadoActual.nombre.uppercase()
                 )
-
-                // Llamada al backend
                 val respuesta = RetrofitInstance.medicamentosApi.getMedicamentos(request)
 
                 val productos = mutableListOf<Medicamento>()
@@ -115,10 +120,7 @@ class MedicamentoViewModel : ViewModel() {
     fun validarFormulario(): Boolean {
         val estadoActual = _estado.value
         val errores = MedicamentoErrores(
-            nombre = if (estadoActual.nombre.isBlank())
-                "Debe ingresar el Nombre"
-            else
-                null
+            nombre = validarNombreMedicamento(estadoActual.nombre)
         )
 
         val hayErrores = listOfNotNull(errores.nombre).isNotEmpty()
