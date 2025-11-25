@@ -71,6 +71,14 @@ fun Perfil(
     ) { uri: Uri? ->
         uri?.let {
             imageUri = it
+            viewModel.saveProfileImage(it.toString())
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        val savedImage = viewModel.getProfileImage()
+        if (savedImage.isNotEmpty()) {
+            imageUri = Uri.parse(savedImage)
         }
     }
 

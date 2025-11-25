@@ -11,11 +11,15 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.medbusq.medbusq.data.repository.UsuarioRepository
+import android.content.Context
+import androidx.core.content.edit
 import com.medbusq.medbusq.data.model.UsuarioUIState as UsuarioUIStateDto
 import com.medbusq.medbusq.data.remote.dto.UsuarioDto
 
 class UsuarioViewModel(application: Application) : AndroidViewModel(application) {
     private val usuarioRepository = UsuarioRepository()
+    private val PROFILE_IMAGE_KEY = "profile_image_uri"
+    private val sharedPreferences = application.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     private val _estado = MutableStateFlow(UsuarioUIState())
 
     val estado: StateFlow<UsuarioUIState> = _estado
@@ -304,6 +308,22 @@ class UsuarioViewModel(application: Application) : AndroidViewModel(application)
     fun cerrarSesion() {
         _estado.update { UsuarioUIState() }
     }
+
+    fun saveProfileImage(uri: String) {
+        try {
+            sharedPreferences.edit { putString(PROFILE_IMAGE_KEY, uri) }
+        } catch (_: Exception) { /* ignore */ }
+    }
+
+    fun getProfileImage(): String {
+        return try {
+            sharedPreferences.getString(PROFILE_IMAGE_KEY, "") ?: ""
+        } catch (_: Exception) {
+            ""
+        }
+    }
+
+    
 
     fun traerUsuario(correo: String){
         viewModelScope.launch {
